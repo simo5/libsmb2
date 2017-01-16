@@ -295,6 +295,10 @@ smb2_read_from_socket(struct smb2_context *smb2)
                         smb2_decode_header(smb2, &smb2->in.iov[1],
                                            &smb2->pdu->header);
 
+                        if (smb2->session_id == 0 && smb2->pdu->header.session_id != 0) {
+                                smb2->session_id = smb2->pdu->header.session_id;
+                        }
+
 			if (smb2_process_pdu(smb2, smb2->pdu) != 0) {
 				smb2_set_error(smb2, "Invalid/garbage pdu received from server. Closing socket");
                                 smb2->in.num_done  = 0;
