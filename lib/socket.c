@@ -82,7 +82,7 @@ smb2_which_events(struct smb2_context *smb2)
         if (smb2->outqueue != NULL) {
                 events |= POLLOUT;
         }
-        
+
 	return events;
 }
 
@@ -95,7 +95,7 @@ static int
 smb2_write_to_socket(struct smb2_context *smb2)
 {
         struct smb2_pdu *pdu;
-        
+
 	if (smb2->fd == -1) {
 		smb2_set_error(smb2, "trying to write but not connected");
 		return -1;
@@ -108,7 +108,7 @@ smb2_write_to_socket(struct smb2_context *smb2)
                 int niov = pdu->out.niov;
                 int i;
                 ssize_t count;
-                
+
                 for (i = 0; i < niov; i++) {
                         iov[i].iov_base = pdu->out.iov[i].buf;
                         iov[i].iov_len = pdu->out.iov[i].len;
@@ -136,7 +136,7 @@ smb2_write_to_socket(struct smb2_context *smb2)
                                        smb2_get_error(smb2));
                         return -1;
                 }
-                
+
                 pdu->out.num_done += count;
 
                 if (pdu->out.num_done == pdu->out.total_size) {
@@ -167,7 +167,7 @@ smb2_read_from_socket(struct smb2_context *smb2)
                 smb2->in.iov[1].len = SMB2_HEADER_SIZE;
                 smb2->in.iov[0].free = NULL;
         }
-        
+
 	/* check how much data is in the input buffer of the socket and read
          * as many PDUs as available
          */
@@ -188,7 +188,7 @@ smb2_read_from_socket(struct smb2_context *smb2)
                         iov[i].iov_len = smb2->in.iov[i].len;
                 }
                 tmpiov = iov;
-                
+
                 /* Skip the vectors we have alredy read */
                 while (num_done >= tmpiov->iov_len) {
                         num_done -= tmpiov->iov_len;
@@ -219,7 +219,7 @@ smb2_read_from_socket(struct smb2_context *smb2)
                 if (smb2->in.num_done < SMB2_SPL_SIZE + SMB2_HEADER_SIZE) {
                         continue;
                 }
-                
+
                 /* make sure stream protocol length is in host endianness */
                 if (smb2->in.num_done == SMB2_SPL_SIZE + SMB2_HEADER_SIZE) {
                         memcpy(&smb2->in.total_size,
@@ -233,7 +233,7 @@ smb2_read_from_socket(struct smb2_context *smb2)
                         struct smb2_header hdr;
                         char magic[4] = {0xFE, 'S', 'M', 'B'};
                         size_t tmp_size = smb2->in.num_done;
-                        
+
                         if (smb2_decode_header(smb2, &smb2->in.iov[1],
                                                &hdr) != 0) {
                                 smb2_set_error(smb2, "Failed to decode smb2 "
@@ -255,11 +255,11 @@ smb2_read_from_socket(struct smb2_context *smb2)
                         }
                         SMB2_LIST_REMOVE(&smb2->waitqueue, pdu);
                         smb2->pdu = pdu;
-                        
+
                         /* copy any io-vectors we got from the pdu */
                         for (i = 0; i < pdu->in.niov; i++) {
                                 struct smb2_iovec *v = &pdu->in.iov[i];
-                                
+
                                 smb2->in.iov[smb2->in.niov].buf = v->buf;
                                 smb2->in.iov[smb2->in.niov].len = v->len;
                                 smb2->in.iov[smb2->in.niov].free = NULL;
@@ -281,12 +281,12 @@ smb2_read_from_socket(struct smb2_context *smb2)
                         smb2->in.iov[smb2->in.niov].len = pdu->in.iov[pdu->in.niov].len;
                         smb2->in.iov[smb2->in.niov].buf = pdu->in.iov[pdu->in.niov].buf;
                         smb2->in.iov[smb2->in.niov].free = NULL;
-                        
+
                         pdu->in.niov++;
                         smb2->in.niov++;
                         continue;
                 }
-                
+
 		if (smb2->in.num_done >= SMB2_SPL_SIZE + SMB2_HEADER_SIZE &&
                     smb2->in.num_done == smb2->in.total_size) {
                         /* Update pdu so that header now contains the
@@ -377,14 +377,14 @@ smb2_service(struct smb2_context *smb2, int revents)
                         return -1;
 		}
 	}
-        
+
 	if (revents & POLLOUT && smb2->outqueue != NULL) {
 		if (smb2_write_to_socket(smb2) != 0) {
                         return -1;
 		}
 	}
 
-        
+
         return 0;
 }
 
@@ -447,7 +447,7 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
         /* ipv6 in [...] form ? */
         if (host[0] == '[') {
                 char *str;
-                
+
                 host++;
                 str = strchr(host, ']');
                 if (str == NULL) {
@@ -502,7 +502,6 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
         smb2->connect_cb   = cb;
         smb2->connect_data = private_data;
 
-      
 	smb2->fd = socket(family, SOCK_STREAM, 0);
 	if (smb2->fd == -1) {
 		smb2_set_error(smb2, "Failed to open smb2 socket. "
@@ -512,7 +511,7 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
 
 	set_nonblocking(smb2->fd);
 	set_tcp_sockopt(smb2->fd, TCP_NODELAY, 1);
-        
+
 	if (connect(smb2->fd, (struct sockaddr *)&ss, socksize) != 0
 		&& errno != EINPROGRESS) {
 		smb2_set_error(smb2, "Connect failed with errno : "
@@ -524,4 +523,3 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
 
         return 0;
 }
-

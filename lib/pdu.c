@@ -51,7 +51,7 @@ smb2_allocate_pdu(struct smb2_context *smb2, enum smb2_command command,
 	struct smb2_pdu *pdu;
         struct smb2_header *hdr;
         char magic[4] = {0xFE, 'S', 'M', 'B'};
-        
+
         pdu = malloc(sizeof(struct smb2_pdu));
         if (pdu == NULL) {
                 smb2_set_error(smb2, "Failed to allocate pdu");
@@ -60,17 +60,17 @@ smb2_allocate_pdu(struct smb2_context *smb2, enum smb2_command command,
         memset(pdu, 0, sizeof(struct smb2_pdu));
 
         hdr = &pdu->header;
-        
+
         memcpy(hdr->protocol_id, magic, 4);
 
         hdr->struct_size = SMB2_HEADER_SIZE;
-        
+
         /* We don't have any credits yet during negprot */
         if (command != SMB2_NEGOTIATE) {
                 hdr->credit_charge = 1;
                 hdr->credit_request_response = 32 - smb2->credits;
         }
-        
+
         hdr->command = command;
         hdr->flags = 0;
         hdr->message_id = smb2->message_id++;
@@ -111,7 +111,7 @@ smb2_allocate_pdu(struct smb2_context *smb2, enum smb2_command command,
                 smb2_free_pdu(smb2, pdu);
                 return NULL;
         }
-        
+
         return pdu;
 }
 
@@ -120,7 +120,7 @@ smb2_free_pdu(struct smb2_context *smb2, struct smb2_pdu *pdu)
 {
         smb2_free_iovector(smb2, &pdu->out);
         smb2_free_iovector(smb2, &pdu->in);
-        
+
         free(pdu);
 }
 
@@ -178,7 +178,7 @@ int
 smb2_get_uint16(struct smb2_iovec *iov, int offset, uint16_t *value)
 {
         uint16_t tmp;
-        
+
         if (offset + sizeof(uint16_t) > iov->len) {
                 return -1;
         }
@@ -191,7 +191,7 @@ int
 smb2_get_uint32(struct smb2_iovec *iov, int offset, uint32_t *value)
 {
         uint32_t tmp;
-        
+
         if (offset + sizeof(uint32_t) > iov->len) {
                 return -1;
         }
@@ -204,7 +204,7 @@ int
 smb2_get_uint64(struct smb2_iovec *iov, int offset, uint64_t *value)
 {
         uint64_t tmp;
-        
+
         if (offset + sizeof(uint64_t) > iov->len) {
                 return -1;
         }
@@ -221,7 +221,7 @@ smb2_encode_header(struct smb2_context *smb2, struct smb2_iovec *iov,
                 smb2_set_error(smb2, "io vector for header is wrong size");
                 return -1;
         }
-        
+
         memcpy(iov->buf, hdr->protocol_id, 4);
         smb2_set_uint16(iov, 4, hdr->struct_size);
         smb2_set_uint16(iov, 6, hdr->credit_charge);
@@ -238,10 +238,10 @@ smb2_encode_header(struct smb2_context *smb2, struct smb2_iovec *iov,
                 smb2_set_uint32(iov, 32, hdr->sync.process_id);
                 smb2_set_uint32(iov, 36, hdr->sync.tree_id);
         }
-        
+
         smb2_set_uint64(iov, 40, hdr->session_id);
         memcpy(iov->buf + 48, hdr->signature, 16);
-        
+
         return 0;
 }
 
@@ -270,7 +270,7 @@ smb2_decode_header(struct smb2_context *smb2, struct smb2_iovec *iov,
                 smb2_get_uint32(iov, 32, &hdr->sync.process_id);
                 smb2_get_uint32(iov, 36, &hdr->sync.tree_id);
         }
-        
+
         smb2_get_uint64(iov, 40, &hdr->session_id);
         memcpy(&hdr->signature, iov->buf + 48, 16);
 
@@ -288,14 +288,14 @@ smb2_queue_pdu(struct smb2_context *smb2, struct smb2_pdu *pdu)
 {
         int i;
         uint32_t len = 0;
-        
+
         for (i = 0; i < pdu->out.niov; i++) {
                 len += pdu->out.iov[i].len;
         }
 
         pdu->out.total_size = len;
         *(uint32_t *)pdu->out.iov[0].buf = htobe32(len - 4);
-        
+
 	smb2_add_to_outqueue(smb2, pdu);
 
 	return 0;
@@ -304,7 +304,7 @@ smb2_queue_pdu(struct smb2_context *smb2, struct smb2_pdu *pdu)
 struct smb2_pdu *smb2_find_pdu(struct smb2_context *smb2,
                                uint64_t message_id) {
         struct smb2_pdu *pdu;
-        
+
         for (pdu = smb2->waitqueue; pdu; pdu = pdu->next) {
                 if (pdu->header.message_id == message_id) {
                         break;
@@ -316,7 +316,7 @@ struct smb2_pdu *smb2_find_pdu(struct smb2_context *smb2,
 int smb2_process_pdu(struct smb2_context *smb2, struct smb2_pdu *pdu)
 {
         smb2->credits += pdu->header.credit_request_response;
-        
+
         switch (pdu->header.command) {
         case SMB2_ECHO:
                 return smb2_process_echo_reply(smb2, pdu);

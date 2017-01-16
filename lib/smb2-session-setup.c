@@ -52,7 +52,7 @@ smb2_encode_session_setup_request(struct smb2_context *smb2,
 {
         int len;
         char *buf;
-        
+
         len = SESSION_SETUP_REQUEST_SIZE & 0xfffffffe;
         buf = malloc(len);
         if (buf == NULL) {
@@ -61,11 +61,11 @@ smb2_encode_session_setup_request(struct smb2_context *smb2,
                 return -1;
         }
         memset(buf, 0, len);
-        
+
         pdu->out.iov[pdu->out.niov].len = len;
         pdu->out.iov[pdu->out.niov].buf = buf;
         pdu->out.iov[pdu->out.niov].free = free;
-        
+
         smb2_set_uint16(&pdu->out.iov[pdu->out.niov], 0, req->struct_size);
         smb2_set_uint8(&pdu->out.iov[pdu->out.niov], 2, req->flags);
         smb2_set_uint8(&pdu->out.iov[pdu->out.niov], 3, req->security_mode);
@@ -83,7 +83,7 @@ smb2_encode_session_setup_request(struct smb2_context *smb2,
                req->security_buffer_length);
         pdu->out.iov[pdu->out.niov].free = free;
         pdu->out.niov++;
-        
+
         return 0;
 }
 
@@ -92,7 +92,7 @@ smb2_decode_session_setup_reply(struct smb2_context *smb2,
                                 struct smb2_pdu *pdu,
                                 struct session_setup_reply *rep)
 {
-        
+
         smb2_get_uint16(&pdu->in.iov[0], 0, &rep->struct_size);
         smb2_get_uint16(&pdu->in.iov[0], 2, &rep->session_flags);
         smb2_get_uint16(&pdu->in.iov[0], 4, &rep->security_buffer_offset);
@@ -118,7 +118,7 @@ int smb2_session_setup_async(struct smb2_context *smb2,
                 smb2_free_pdu(smb2, pdu);
                 return -1;
         }
-        
+
         if (smb2_queue_pdu(smb2, pdu)) {
                 smb2_free_pdu(smb2, pdu);
                 return -1;
@@ -131,10 +131,10 @@ int smb2_process_session_setup_reply(struct smb2_context *smb2,
                                      struct smb2_pdu *pdu)
 {
         struct session_setup_reply reply;
-        
+
         smb2_decode_session_setup_reply(smb2, pdu, &reply);
 
         pdu->cb(smb2, pdu->header.status, &reply, pdu->cb_data);
-        
+
         return 0;
 }

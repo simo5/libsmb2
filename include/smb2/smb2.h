@@ -34,7 +34,7 @@ extern "C" {
 #define SMB2_FLAGS_PRIORITY_MASK      0x00000070
 #define SMB2_FLAGS_DFS_OPERATIONS     0x10000000
 #define SMB2_FLAGS_REPLAY_OPERATION   0x20000000
-        
+
 enum smb2_command {
         SMB2_NEGOTIATE       = 0x0000,
         SMB2_SESSION_SETUP,
@@ -74,11 +74,11 @@ enum smb2_command {
 #define SMB2_GLOBAL_CAP_PERSISTENT_HANDLES 0x00000010
 #define SMB2_GLOBAL_CAP_DIRECTORY_LEASING  0x00000020
 #define SMB2_GLOBAL_CAP_ENCRYPTION         0x00000040
-        
+
 #define SMB2_NEGOTIATE_MAX_DIALECTS 10
 
 #define NEGOTIATE_REQUEST_SIZE 36
-        
+
 struct negotiate_request {
         uint16_t struct_size;
         uint16_t dialect_count;

@@ -73,7 +73,7 @@ int smb2_service(struct smb2_context *smb2, int revents);
  * Returns the client_guid for this context.
  */
 const char *smb2_get_client_guid(struct smb2_context *smb2);
-        
+
 /*
  * Asynchronous call to connect a TCP connection to the server
  *
@@ -191,7 +191,7 @@ int smb2_echo_async(struct smb2_context *smb2,
  */
 int smb2_logoff_async(struct smb2_context *smb2,
                       smb2_command_cb cb, void *cb_data);
-        
+
 #ifdef __cplusplus
 }
 #endif

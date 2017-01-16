@@ -57,7 +57,7 @@ struct smb2_sync {
         uint32_t process_id;
         uint32_t tree_id;
 };
-        
+
 struct smb2_header {
         uint8_t protocol_id[4];
         uint16_t struct_size;
@@ -84,9 +84,9 @@ struct smb2_context {
         void *connect_data;
 
         int credits;
-        
+
         char client_guid[16];
-        
+
         uint32_t tree_id;
         uint64_t message_id;
         uint64_t session_id;
@@ -109,7 +109,7 @@ struct smb2_context {
         uint32_t max_transact_size;
         uint32_t max_read_size;
         uint32_t max_write_size;
-        
+
         char error_string[MAX_ERROR_SIZE];
 };
 
@@ -148,7 +148,7 @@ void smb2_free_pdu(struct smb2_context *smb2, struct smb2_pdu *pdu);
 
 int smb2_queue_pdu(struct smb2_context *smb2, struct smb2_pdu *pdu);
 int smb2_process_pdu(struct smb2_context *smb2, struct smb2_pdu *pdu);
-        
+
 struct smb2_pdu *smb2_find_pdu(struct smb2_context *smb2, uint64_t message_id);
 void smb2_free_iovector(struct smb2_context *smb2, struct smb2_io_vectors *v);
 
@@ -156,7 +156,7 @@ int smb2_encode_header(struct smb2_context *smb2, struct smb2_iovec *iov,
                        struct smb2_header *hdr);
 int smb2_decode_header(struct smb2_context *smb2, struct smb2_iovec *iov,
                        struct smb2_header *hdr);
-        
+
 int smb2_set_uint8(struct smb2_iovec *iov, int offset, uint8_t value);
 int smb2_set_uint16(struct smb2_iovec *iov, int offset, uint16_t value);
 int smb2_set_uint32(struct smb2_iovec *iov, int offset, uint32_t value);
@@ -175,7 +175,7 @@ int smb2_process_negotiate_reply(struct smb2_context *smb2,
                                  struct smb2_pdu *pdu);
 int smb2_process_session_setup_reply(struct smb2_context *smb2,
                                      struct smb2_pdu *pdu);
-        
+
 #ifdef __cplusplus
 }
 #endif
